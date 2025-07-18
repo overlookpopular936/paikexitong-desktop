@@ -1,18 +1,49 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { Menu } from "@tauri-apps/api/menu/menu";
+import { ref } from "vue";
 
 const greetMsg = ref("");
 const name = ref("");
+
+async function setMenu() {
+  const menu = await Menu.new({
+    items: [
+      {
+        id: "Open",
+        text: "open",
+        action: () => {
+          console.log("open pressed");
+        },
+      },
+      {
+        id: "Close",
+        text: "close",
+        action: () => {
+          console.log("close pressed");
+        },
+      },
+    ],
+  });
+  await menu.setAsAppMenu();
+}
 
 async function greet() {
   // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
   greetMsg.value = await invoke("greet", { name: name.value });
 }
+
+onMounted(() => {
+  setMenu();
+});
 </script>
 
 <template>
   <main class="container">
+    <div class="w-full h-10 bg-blue font-bold color-gray-800">test</div>
+    <div class="w-full flex items-center justify-center gap-x-4 text-4xl p-2 mt-4">
+      <div class="i-vscode-icons:file-type-light-pnpm"></div>
+    </div>
     <h1>Welcome to Tauri + Vue</h1>
 
     <div class="row">
@@ -30,7 +61,9 @@ async function greet() {
 
     <form class="row" @submit.prevent="greet">
       <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
+      <button type="submit">
+        Greet
+      </button>
     </form>
     <p>{{ greetMsg }}</p>
   </main>
@@ -44,8 +77,8 @@ async function greet() {
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #249b73);
 }
-
 </style>
+
 <style>
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
@@ -156,5 +189,4 @@ button {
     background-color: #0f0f0f69;
   }
 }
-
 </style>
